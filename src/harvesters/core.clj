@@ -17,9 +17,9 @@
   [width height title]
 
   (swap! globals assoc
-         :width     width
-         :height    height
-         :title     title
+         :width width
+         :height height
+         :title title
          :last-time (System/currentTimeMillis))
 
   (swap! globals assoc
@@ -31,6 +31,7 @@
   (GLFW/glfwDefaultWindowHints)
   (GLFW/glfwWindowHint GLFW/GLFW_VISIBLE GLFW/GLFW_FALSE)
   (GLFW/glfwWindowHint GLFW/GLFW_RESIZABLE GLFW/GLFW_TRUE)
+  (GLFW/glfwWindowHint GLFW/GLFW_MAXIMIZED GLFW/GLFW_TRUE)
   (swap! globals assoc
          :window (GLFW/glfwCreateWindow width height title 0 0))
   (when (= (:window @globals) nil)
@@ -46,10 +47,10 @@
   (GLFW/glfwSetKeyCallback (:window @globals) (:keyCallback @globals))
 
   (let [vidmode (GLFW/glfwGetVideoMode (GLFW/glfwGetPrimaryMonitor))]
-    (GLFW/glfwSetWindowPos
-      (:window @globals)
-      (/ (- (.width vidmode) width) 2)
-      (/ (- (.height vidmode) height) 2))
+    #_(GLFW/glfwSetWindowPos
+        (:window @globals)
+        (/ (- (.width vidmode) width) 2)
+        (/ (- (.height vidmode) height) 2))
     (GLFW/glfwMakeContextCurrent (:window @globals))
     (GLFW/glfwSwapInterval 1)
     (GLFW/glfwShowWindow (:window @globals))))
@@ -70,7 +71,7 @@
   (let [{:keys [width height angle]} @globals
         w2 (/ width 2.0)
         h2 (/ height 2.0)]
-    (GL11/glClear (bit-or GL11/GL_COLOR_BUFFER_BIT  GL11/GL_DEPTH_BUFFER_BIT))
+    (GL11/glClear (bit-or GL11/GL_COLOR_BUFFER_BIT GL11/GL_DEPTH_BUFFER_BIT))
     (GL11/glLoadIdentity)
     (GL11/glTranslatef w2 h2 0)
     (GL11/glRotatef angle 0 0 1)
