@@ -5,6 +5,8 @@
 
 (def cfg (promise))
 
+(defn update-config [] )
+
 (deliver cfg (e/read-string (slurp cfg-path)))
 
 
