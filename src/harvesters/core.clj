@@ -1,5 +1,7 @@
 (ns harvesters.core
   (:gen-class)
+  (:require [harvesters.core]
+            [clojure.tools.logging :as log])
   (:import (org.lwjgl.glfw GLFWErrorCallback)
            (org.lwjgl.opengl GL GL11)
            (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWKeyCallback)))
@@ -23,7 +25,7 @@
          :last-time (System/currentTimeMillis))
 
   (swap! globals assoc
-         :errorCallback (GLFWErrorCallback/createPrint System/err))
+         :errorCallback (GLFWErrorCallback/createPrint (log/log-stream :error (namespace ::x))))
   (GLFW/glfwSetErrorCallback (:errorCallback @globals))
   (when-not (GLFW/glfwInit)
     (throw (IllegalStateException. "Unable to initialize GLFW")))
@@ -31,7 +33,7 @@
   (GLFW/glfwDefaultWindowHints)
   (GLFW/glfwWindowHint GLFW/GLFW_VISIBLE GLFW/GLFW_FALSE)
   (GLFW/glfwWindowHint GLFW/GLFW_RESIZABLE GLFW/GLFW_TRUE)
-  (GLFW/glfwWindowHint GLFW/GLFW_MAXIMIZED GLFW/GLFW_TRUE)
+  ;(GLFW/glfwWindowHint GLFW/GLFW_MAXIMIZED GLFW/GLFW_TRUE)
   (swap! globals assoc
          :window (GLFW/glfwCreateWindow width height title 0 0))
   (when (= (:window @globals) nil)

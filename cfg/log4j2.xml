@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="logs/harvesters.log"
+                     filePattern="logs/harvesters.%i.log">
+            <PatternLayout pattern="%d [%10.10t] %-7level - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="100 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="RollingFile" level="debug"/>
+        </Root>
+    </Loggers>
+</Configuration>
