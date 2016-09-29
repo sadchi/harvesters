@@ -1,4 +1,3 @@
-{:window {:width     nil
-          :height    nil
-          :maximazed true}
- }
+{:window {:width     800
+          :height    600
+          :maximized true}}

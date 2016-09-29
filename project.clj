@@ -7,6 +7,8 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/core.async "0.2.391"]]
 
+  :plugins [[lein-gorilla "0.3.6"]]
+
   :java-opts ["-Dorg.lwjgl.util.Debug=true" "-Dorg.lwjgl.librarypath=native"]
 
   :main ^:skip-aot harvesters.core
