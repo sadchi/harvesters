@@ -2,10 +2,11 @@
   (:gen-class)
   (:require [harvesters.core]
             [harvesters.config :refer [cfg]]
+            [harvesters.events-processing :as e-p]
             [clojure.tools.logging :as log])
   (:import (org.lwjgl.glfw GLFWErrorCallback)
            (org.lwjgl.opengl GL GL11)
-           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWKeyCallback)))
+           (org.lwjgl.glfw GLFW GLFWErrorCallback)))
 
 
 (def window-title "Harvesters")
@@ -22,13 +23,13 @@
   (let [window (or (GLFW/glfwCreateWindow width height window-title 0 0) (throw (RuntimeException. "Failed to create the GLFW window")))
         width-buf (int-array 1)
         height-buf (int-array 1)]
-        (GLFW/glfwMakeContextCurrent window)
-        (GLFW/glfwSwapInterval 1)
-        (GLFW/glfwShowWindow window)
-        (GLFW/glfwGetFramebufferSize window width-buf height-buf)
-        {:window              window
-         :frame-buffer-width  (aget width-buf 0)
-         :frame-buffer-height (aget height-buf 0)}))
+    (GLFW/glfwMakeContextCurrent window)
+    (GLFW/glfwSwapInterval 1)
+    (GLFW/glfwShowWindow window)
+    (GLFW/glfwGetFramebufferSize window width-buf height-buf)
+    {:window              window
+     :frame-buffer-width  (aget width-buf 0)
+     :frame-buffer-height (aget height-buf 0)}))
 
 (defn init-gl [width height]
   (GL/createCapabilities)
@@ -41,17 +42,16 @@
   (GL11/glMatrixMode GL11/GL_MODELVIEW))
 
 (defn draw []
-
   (GL11/glClear (bit-or GL11/GL_COLOR_BUFFER_BIT GL11/GL_DEPTH_BUFFER_BIT))
   (GL11/glLoadIdentity)
   (GL11/glBegin GL11/GL_TRIANGLES)
   (do
     (GL11/glColor3f 1.0 0.0 0.0)
-    (GL11/glVertex2f 0 0.5)
+    (GL11/glVertex2i 100 200)
     (GL11/glColor3f 0.0 1.0 0.0)
-    (GL11/glVertex2f -0.5 0.5)
+    (GL11/glVertex2i 100 100)
     (GL11/glColor3f 0.0 0.0 1.0)
-    (GL11/glVertex2f 0.5 0.5))
+    (GL11/glVertex2i 200 100))
   (GL11/glEnd))
 
 (defn main-loop [window]
@@ -62,10 +62,10 @@
 
 (defn -main []
   (log/info (apply str (take 80 (repeat "*"))))
-  (log/info "Starting ....")
   (try
     (let [{:keys [window frame-buffer-width frame-buffer-height]} (init-window (:window @cfg))]
       (init-gl frame-buffer-width frame-buffer-height)
+      (e-p/attach-event-callbacks window)
       (main-loop window)
       (GLFW/glfwDestroyWindow window))
     (finally
