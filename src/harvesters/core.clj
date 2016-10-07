@@ -3,13 +3,20 @@
   (:require [harvesters.core]
             [harvesters.config :refer [cfg]]
             [harvesters.events-processing :as e-p]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [clojure.core.async :as async :refer [chan >!!]])
   (:import (org.lwjgl.glfw GLFWErrorCallback)
            (org.lwjgl.opengl GL GL11)
-           (org.lwjgl.glfw GLFW GLFWErrorCallback)))
+           (org.lwjgl.glfw GLFW GLFWErrorCallback GLFWFramebufferSizeCallback)))
 
 
 (def window-title "Harvesters")
+
+(def ^:private resize-chan (chan (async/sliding-buffer 6)))
+(def resize-pub (async/pub resize-chan :event-type))
+
+
+
 
 (defn- init-window [{:keys [width height maximized] :or {width 800 height 600}}]
   (log/debug "Trying to create window using params:" [width height maximized])
@@ -66,6 +73,8 @@
     (let [{:keys [window frame-buffer-width frame-buffer-height]} (init-window (:window @cfg))]
       (init-gl frame-buffer-width frame-buffer-height)
       (e-p/attach-event-callbacks window)
+      (GLFW/glfwSetFramebufferSizeCallback window (proxy [GLFWFramebufferSizeCallback] []
+                                                    (invoke [])))
       (main-loop window)
       (GLFW/glfwDestroyWindow window))
     (finally
